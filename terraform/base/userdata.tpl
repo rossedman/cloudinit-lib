@@ -14,3 +14,6 @@ runcmd:
   - [apt-get, update]
   - [apt-get, install, -y, tailscale]
   - [tailscale, up, -authkey, ${tailscale_key}]
+packages:
+  - zsh
+  - vim

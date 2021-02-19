@@ -21,22 +21,27 @@ resource "digitalocean_vpc" "homelab" {
 }
 
 resource "digitalocean_droplet" "toolbox" {
-  name      = "toolbox-01"
+  count     = 3
+  name      = "toolbox-${count.index}"
   size      = "s-1vcpu-1gb"
   image     = "ubuntu-20-04-x64"
   region    = digitalocean_vpc.homelab.region
   vpc_uuid  = digitalocean_vpc.homelab.id
   user_data = templatefile("${path.module}/userdata.tpl", {
-      tailscale_key = var.tailscale_key
+    tailscale_key = var.tailscale_key
   })
 }
 
 resource "digitalocean_project" "labscale" {
   name        = "labscale"
   description = "A project for scaling homelab with tailscale"
-  resources   = [digitalocean_droplet.toolbox.urn]
+  resources   = digitalocean_droplet.toolbox.*.urn
 }
 
-output "ip" {
-  value = digitalocean_droplet.toolbox.ipv4_address
+output "public_ip" {
+  value = digitalocean_droplet.toolbox.*.ipv4_address
+}
+
+output "private_ip" {
+  value = digitalocean_droplet.toolbox.*.ipv4_address_private 
 }
