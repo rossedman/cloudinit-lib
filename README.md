@@ -2,6 +2,9 @@
 ```
 export DIGITALOCEAN_TOKEN=<TOKEN>
 export TF_VAR_tailscale_key=<TAILSCALE_KEY>
+terraform init terraform/base
+terraform plan terraform/base
+terraform apply terraform/base
 ```
 
 ### Resources

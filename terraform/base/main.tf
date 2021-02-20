@@ -20,13 +20,19 @@ resource "digitalocean_vpc" "homelab" {
   ip_range = "10.10.10.0/24"
 }
 
+resource "digitalocean_ssh_key" "default" {
+  name       = "Labscale - Terraform"
+  public_key = file("~/.ssh/id_rsa.pub")
+}
+
 resource "digitalocean_droplet" "toolbox" {
-  count     = 3
+  count     = 1
   name      = "toolbox-${count.index}"
   size      = "s-1vcpu-1gb"
   image     = "ubuntu-20-04-x64"
   region    = digitalocean_vpc.homelab.region
   vpc_uuid  = digitalocean_vpc.homelab.id
+  ssh_keys  = [digitalocean_ssh_key.default.fingerprint]
   user_data = templatefile("${path.module}/userdata.tpl", {
     tailscale_key = var.tailscale_key
   })
