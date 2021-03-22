@@ -15,9 +15,9 @@ variable "tailscale_key" {
 }
 
 resource "digitalocean_vpc" "homelab" {
-  name     = "homelab"
+  name     = "homelab2"
   region   = "nyc3"
-  ip_range = "10.10.10.0/24"
+  ip_range = "10.20.10.0/24"
 }
 
 resource "digitalocean_ssh_key" "default" {
@@ -25,9 +25,9 @@ resource "digitalocean_ssh_key" "default" {
   public_key = file("~/.ssh/id_rsa.pub")
 }
 
-resource "digitalocean_droplet" "toolbox" {
-  count     = 1
-  name      = "toolbox-${count.index}"
+resource "digitalocean_droplet" "server" {
+  count     = 3
+  name      = "server-${count.index}"
   size      = "s-1vcpu-1gb"
   image     = "ubuntu-20-04-x64"
   region    = digitalocean_vpc.homelab.region
@@ -41,13 +41,13 @@ resource "digitalocean_droplet" "toolbox" {
 resource "digitalocean_project" "labscale" {
   name        = "labscale"
   description = "A project for scaling homelab with tailscale"
-  resources   = digitalocean_droplet.toolbox.*.urn
+  resources   = digitalocean_droplet.server.*.urn
 }
 
 output "public_ip" {
-  value = digitalocean_droplet.toolbox.*.ipv4_address
+  value = digitalocean_droplet.server.*.ipv4_address
 }
 
 output "private_ip" {
-  value = digitalocean_droplet.toolbox.*.ipv4_address_private 
+  value = digitalocean_droplet.server.*.ipv4_address_private 
 }
